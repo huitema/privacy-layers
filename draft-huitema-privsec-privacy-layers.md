@@ -99,6 +99,40 @@ not change, they will quickly use it to identify the user, even in the
 absence of cookies. The browser privacy mechanisms will be nullified by the
 lack of coordination with IPv6 address allocation.
 
+## Domain name and SNI
+
+Setting up a TLS encrypted connection is usually preceded by a DNS request for the
+name of the service. Some servers host multiple services, each referenced by its
+own domain name. During the TLS connection setup, the Service Name Information (SNI)
+is used to direct the incoming connection to the right service. In the current
+versions of TLS, the SNI is sent in clear text during the initial exchange. This
+is rightly perceived as a privacy issue, since the SNI reveals the service
+accessed by the user. There are efforts to fix this by finding some way to
+encrypt the SNI.
+
+Sending name service requests in clear text is also perceived as a privacy risk,
+as discussed in [@?RFC7626]. This can be mitigated by sending DNS requests over a 
+TLS protected connection, as defined in [@?RFC7858]. But few DNS
+servers accept TLS connections today. There are many reasons for this slow
+deployment, and one of them is probably the clear text SNI issue. Yes, 
+sending the DNS requests over an encrypted connection will prevent adversaries
+from watching the name of the services requested by the user. But the same
+adversaries can then watch the user traffic, observe the SNI parameters of
+outgoing TLS connection, and retrieve the information that DNS over TLS 
+attempted to hide. 
+
+Similarly, the limited deployment of DNS over TLS reduces the pressure to 
+develop and deploy some form of SNI encryption. If the SNI was encrypted but
+the DNS traffic was not, the adversaires would just observe the DNS queries
+and obtain the list of services requested by the users.
+
+Deploying either DNS over TLS or SNI encryption provide some value. For example,
+SNI encryption reduces the risk of SNI based filtering or censorship. DNS 
+over TLS can provide unfiltered access to name resolution services. But
+one without the other is an incomplete solution, and incomplete solutions
+do not get deployed quickly.
+
+
 
 # Security Considerations
 
